@@ -2,171 +2,198 @@ import { useState } from "react";
 import "./App.css";
 
 /* ============================================================
-   CLASSIFICAZIONE AUTOMATICA INGREDIENTI
+   TRADUZIONI UI + RICETTE PROFESSIONALI
 ============================================================ */
-function classifyIngredients(list) {
-  const washList = ["pomodoro","zucchina","carota","insalata","spinaci","peperone","cipolla","patata","melanzana","broccoli","cavolo"];
-  const cookFirst = ["pollo","manzo","tacchino","maiale","carne","pesce","salmone","tonno fresco","gamberi"];
-  const boilSeparately = ["pasta","riso","couscous","quinoa","spaghetti","penne","fusilli","tagliatelle"];
-  const readyToUse = ["pane","formaggio","mozzarella","tonno","olive","prosciutto","salame","yogurt"];
-
-  const toWash = [];
-  const toCookFirst = [];
-  const toBoil = [];
-  const ready = [];
-  const others = [];
-
-  list.forEach(item => {
-    if (washList.includes(item)) toWash.push(item);
-    else if (cookFirst.includes(item)) toCookFirst.push(item);
-    else if (boilSeparately.includes(item)) toBoil.push(item);
-    else if (readyToUse.includes(item)) ready.push(item);
-    else others.push(item);
-  });
-
-  return { toWash, toCookFirst, toBoil, ready, others };
-}
-
-/* ============================================================
-   PROFILI CULTURALI
-============================================================ */
-function applyCulture(culture) {
-  const profiles = {
-    italiana: {
-      base: "Usa olio extravergine, basilico fresco e cottura lenta.",
-      spices: "origano, basilico, pepe nero",
-      plating: "impiattamento pulito, minimalista, con filo d’olio a crudo"
-    },
-    africana: {
-      base: "Usa spezie forti, cottura lunga e sapori intensi.",
-      spices: "curcuma, curry, paprika, zenzero",
-      plating: "porzioni abbondanti, colori vivaci"
-    },
-    asiatica: {
-      base: "Cottura veloce nel wok, sapori bilanciati.",
-      spices: "zenzero, salsa di soia, sesamo",
-      plating: "impiattamento compatto, ordinato"
-    },
-    americana: {
-      base: "Cotture ricche, burro, griglia e porzioni grandi.",
-      spices: "paprika affumicata, pepe, BBQ rub",
-      plating: "impiattamento rustico"
-    },
-    francese: {
-      base: "Tecniche precise, burro, riduzioni e eleganza.",
-      spices: "timo, rosmarino, pepe bianco",
-      plating: "impiattamento raffinato"
-    },
-    spagnola: {
-      base: "Soffritto, paprika, cotture lente e sapori intensi.",
-      spices: "paprika dolce, aglio, prezzemolo",
-      plating: "impiattamento conviviale"
-    }
-  };
-
-  return profiles[culture] || {
-    base: "Stile neutro e versatile.",
-    spices: "sale, pepe, erbe miste",
-    plating: "impiattamento semplice"
-  };
-}
-
-/* ============================================================
-   PROFILI DIFFICOLTÀ
-============================================================ */
-function applyDifficulty(level) {
-  const profiles = {
-    facile: "Tecniche semplici, pochi passaggi, zero complessità.",
-    media: "Tecniche base + qualche passaggio più preciso.",
-    difficile: "Tecniche professionali, tempi precisi, riduzioni e mantecature."
-  };
-  return profiles[level] || "Tecniche standard.";
-}
-
-/* ============================================================
-   PROFILI BUDGET
-============================================================ */
-function applyBudget(budget) {
-  const profiles = {
-    basso: "Ingredienti economici, ricetta semplice e ottimizzata.",
-    medio: "Ingredienti freschi e bilanciati.",
-    alto: "Ingredienti premium, tecniche gourmet e impiattamento elegante."
-  };
-  return profiles[budget] || "Budget neutro.";
-}
-
-/* ============================================================
-   PROFILI TIPO DI PASTO
-============================================================ */
-function applyMealType(type) {
-  const profiles = {
-    colazione: "Ricetta leggera e veloce, perfetta per iniziare la giornata.",
-    pranzo: "Pasto completo e bilanciato.",
-    cena: "Ricetta più leggera o elegante.",
-    snack: "Preparazione rapida e semplice."
-  };
-  return profiles[type] || "Pasto generico.";
-}
-
-/* ============================================================
-   MOTORE INTELLIGENTE DI RICETTE
-============================================================ */
-function generateSmartRecipe(list, filters) {
-  const { toWash, toCookFirst, toBoil, ready, others } = classifyIngredients(list);
-  const culture = applyCulture(filters.culture);
-  const difficulty = applyDifficulty(filters.difficulty);
-  const budget = applyBudget(filters.budget);
-  const mealType = applyMealType(filters.mealType);
-
-  let steps = "";
-
-  steps += "1. **Preparazione degli ingredienti**\n";
-  if (toWash.length) steps += `   - Lava e taglia: ${toWash.join(", ")}.\n`;
-  if (others.length) steps += `   - Taglia a pezzi: ${others.join(", ")}.\n`;
-  if (ready.length) steps += `   - Tieni da parte (pronti all’uso): ${ready.join(", ")}.\n`;
-  if (toBoil.length) steps += `   - Prepara una pentola d’acqua salata per: ${toBoil.join(", ")}.\n`;
-
-  steps += "\n2. **Preparazione del condimento**\n";
-  steps += `   - ${culture.base}\n`;
-  steps += "   - Scalda una padella con olio.\n";
-
-  if (toCookFirst.length) steps += `   - Cuoci per primi: ${toCookFirst.join(", ")}.\n`;
-  if (others.length) steps += `   - Aggiungi poi: ${others.join(", ")}.\n`;
-  if (toWash.length) steps += `   - Aggiungi infine: ${toWash.join(", ")} e cuoci 5–7 minuti.\n`;
-
-  if (toBoil.length) {
-    steps += "\n3. **Cottura separata**\n";
-    steps += `   - Cuoci ${toBoil.join(", ")} secondo i tempi indicati.\n`;
-    steps += "   - Scola e tieni da parte.\n";
+const translations = {
+  it: {
+    title: "AI Food App",
+    subtitle: "La cucina intelligente che capisce davvero cosa stai cucinando",
+    langCulture: "Lingua & Cultura",
+    filters: "Filtri",
+    generate: "Genera ricetta",
+    newRecipe: "Nuova ricetta",
+    copy: "Copia ricetta",
+    ingredientsPlaceholder: "Inserisci gli ingredienti",
+    mealType: "Tipo di pasto",
+    difficulty: "Difficoltà",
+    budget: "Budget",
+    time: "Tempo",
+    diet: "Dieta",
+    culture: "Cultura",
+    resultTitle: "Ricetta generata:",
+    finalMessage: "Buon appetito!",
+    aiTip: "Consiglio dello chef: aggiungi un filo d’olio a crudo per esaltare i sapori."
+  },
+  en: {
+    title: "AI Food App",
+    subtitle: "The smart kitchen that truly understands what you're cooking",
+    langCulture: "Language & Culture",
+    filters: "Filters",
+    generate: "Generate recipe",
+    newRecipe: "New recipe",
+    copy: "Copy recipe",
+    ingredientsPlaceholder: "Enter ingredients",
+    mealType: "Meal type",
+    difficulty: "Difficulty",
+    budget: "Budget",
+    time: "Time",
+    diet: "Diet",
+    culture: "Culture",
+    resultTitle: "Generated recipe:",
+    finalMessage: "Enjoy your meal!",
+    aiTip: "Chef’s tip: add a drizzle of olive oil at the end to enhance the flavors."
+  },
+  fr: {
+    title: "AI Food App",
+    subtitle: "La cuisine intelligente qui comprend vraiment ce que vous cuisinez",
+    langCulture: "Langue & Culture",
+    filters: "Filtres",
+    generate: "Générer la recette",
+    newRecipe: "Nouvelle recette",
+    copy: "Copier la recette",
+    ingredientsPlaceholder: "Entrez les ingrédients",
+    mealType: "Type de repas",
+    difficulty: "Difficulté",
+    budget: "Budget",
+    time: "Temps",
+    diet: "Régime",
+    culture: "Culture",
+    resultTitle: "Recette générée :",
+    finalMessage: "Bon appétit !",
+    aiTip: "Astuce du chef : ajoutez un filet d’huile d’olive pour sublimer les saveurs."
+  },
+  es: {
+    title: "AI Food App",
+    subtitle: "La cocina inteligente que realmente entiende lo que cocinas",
+    langCulture: "Idioma y Cultura",
+    filters: "Filtros",
+    generate: "Generar receta",
+    newRecipe: "Nueva receta",
+    copy: "Copiar receta",
+    ingredientsPlaceholder: "Ingresa los ingredientes",
+    mealType: "Tipo de comida",
+    difficulty: "Dificultad",
+    budget: "Presupuesto",
+    time: "Tiempo",
+    diet: "Dieta",
+    culture: "Cultura",
+    resultTitle: "Receta generada:",
+    finalMessage: "¡Buen provecho!",
+    aiTip: "Consejo del chef: añade un chorrito de aceite de oliva al final para realzar los sabores."
   }
+};
 
-  if (toBoil.length) {
-    steps += "\n4. **Unione**\n";
-    steps += `   - Unisci ${toBoil.join(", ")} al condimento.\n`;
-    steps += "   - Mescola bene.\n";
-  }
+/* ============================================================
+   EMOJI DEL PIATTO
+============================================================ */
+function getDishEmoji(ingredients) {
+  const text = ingredients.join(" ");
 
-  steps += "\n5. **Finalizzazione**\n";
-  steps += `   - ${difficulty}\n`;
-  steps += `   - Aggiungi spezie tipiche: ${culture.spices}.\n`;
+  if (/pasta|spaghetti|penne|fusilli/.test(text)) return "🍝";
+  if (/pollo|manzo|carne|tacchino/.test(text)) return "🍗";
+  if (/pesce|salmone|tonno/.test(text)) return "🐟";
+  if (/verdura|insalata|zucchina|carota/.test(text)) return "🥗";
+  if (/dolce|zucchero|cioccolato/.test(text)) return "🍰";
 
-  steps += "\n6. **Impiattamento**\n";
-  steps += `   - ${culture.plating}.\n`;
-  if (ready.includes("pane")) steps += "   - Servi il pane a lato.\n";
+  return "🍽️";
+}
 
-  steps += "\n7. **Valori nutrizionali (stima)**\n";
-  steps += "   - Porzioni: 1–2\n";
-  steps += "   - Calorie: 350–650 kcal\n";
+/* ============================================================
+   GENERATORE DI RICETTE MULTILINGUA
+============================================================ */
+function generateRecipeText(list, filters, t, lang) {
+  const steps = {
+    it: `
+1. Preparazione degli ingredienti
+   - Lava e prepara: ${list.join(", ")}.
 
-  return steps;
+2. Cottura
+   - Scalda una padella e cuoci gli ingredienti con calma.
+   - Aggiungi spezie e aromi secondo la cultura scelta.
+
+3. Finalizzazione
+   - Mescola tutto con cura.
+   - Assaggia e regola sale e spezie.
+
+4. Impiattamento
+   - Servi con stile e un tocco personale.
+
+${t.aiTip}
+
+${t.finalMessage}
+`,
+
+    en: `
+1. Ingredient preparation
+   - Wash and prepare: ${list.join(", ")}.
+
+2. Cooking
+   - Heat a pan and cook the ingredients gently.
+   - Add spices and seasonings according to the selected culture.
+
+3. Final touch
+   - Combine everything smoothly.
+   - Taste and adjust salt and spices.
+
+4. Plating
+   - Serve with elegance and a personal touch.
+
+${t.aiTip}
+
+${t.finalMessage}
+`,
+
+    fr: `
+1. Préparation des ingrédients
+   - Lavez et préparez : ${list.join(", ")}.
+
+2. Cuisson
+   - Chauffez une poêle et faites cuire les ingrédients doucement.
+   - Ajoutez des épices selon la culture choisie.
+
+3. Finition
+   - Mélangez le tout délicatement.
+   - Goûtez et ajustez le sel et les épices.
+
+4. Dressage
+   - Servez avec élégance et une touche personnelle.
+
+${t.aiTip}
+
+${t.finalMessage}
+`,
+
+    es: `
+1. Preparación de los ingredientes
+   - Lava y prepara: ${list.join(", ")}.
+
+2. Cocción
+   - Calienta una sartén y cocina los ingredientes suavemente.
+   - Añade especias según la cultura seleccionada.
+
+3. Finalización
+   - Mezcla todo con cuidado.
+   - Prueba y ajusta la sal y las especias.
+
+4. Emplatado
+   - Sirve con estilo y un toque personal.
+
+${t.aiTip}
+
+${t.finalMessage}
+`
+  };
+
+  return steps[lang];
 }
 
 /* ============================================================
    COMPONENTE PRINCIPALE
 ============================================================ */
-function App() {
+export default function App() {
   const [ingredients, setIngredients] = useState("");
   const [recipe, setRecipe] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [budget, setBudget] = useState("");
   const [time, setTime] = useState("");
@@ -176,58 +203,56 @@ function App() {
   const [language, setLanguage] = useState("it");
   const [culture, setCulture] = useState("");
 
+  const t = translations[language];
+
   function generateRecipe() {
     const list = ingredients
       .split(/[\s,;]+/)
-      .map(i => i.trim().toLowerCase())
+      .map(i => i.trim())
       .filter(i => i.length > 0);
 
-    const filters = { budget, time, mealType, difficulty, diet, culture };
-    const steps = generateSmartRecipe(list, filters);
+    if (list.length === 0) return;
 
-    const finalRecipe = `
-🍽️ Ricetta personalizzata
+    setLoading(true);
 
-Ingredienti:
-${list.map(i => "• " + i).join("\n")}
+    setTimeout(() => {
+      const emoji = getDishEmoji(list);
+      const text = generateRecipeText(list, {}, t, language);
 
-Dettagli selezionati:
-• Budget: ${budget || "non specificato"}
-• Tempo: ${time || "non specificato"}
-• Tipo di pasto: ${mealType || "non specificato"}
-• Difficoltà: ${difficulty || "non specificata"}
-• Dieta: ${diet || "non specificata"}
-• Cultura: ${culture || "non specificata"}
-• Lingua: ${language}
+      setRecipe(`${emoji} ${t.resultTitle}\n\n${text}`);
+      setLoading(false);
+    }, 1200);
+  }
 
-────────────────────────────
+  function copyRecipe() {
+    navigator.clipboard.writeText(recipe);
+  }
 
-${steps}
-`;
-
-    setRecipe(finalRecipe);
+  function resetAll() {
+    setIngredients("");
+    setRecipe("");
   }
 
   return (
     <div className="container">
       <header>
-        <h1 className="title">AI Food App</h1>
-        <p className="subtitle">La cucina intelligente che capisce davvero cosa stai cucinando</p>
+        <h1 className="title">{t.title}</h1>
+        <p className="subtitle">{t.subtitle}</p>
       </header>
 
       {/* LINGUA & CULTURA */}
       <section className="filters">
-        <h2>Lingua & Cultura</h2>
+        <h2>{t.langCulture}</h2>
         <div className="filter-grid">
           <select value={language} onChange={(e) => setLanguage(e.target.value)}>
             <option value="it">Italiano</option>
-            <option value="en">Inglese</option>
-            <option value="fr">Francese</option>
-            <option value="es">Spagnolo</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
           </select>
 
           <select value={culture} onChange={(e) => setCulture(e.target.value)}>
-            <option value="">Cultura</option>
+            <option value="">{t.culture}</option>
             <option value="italiana">Italiana</option>
             <option value="africana">Africana</option>
             <option value="asiatica">Asiatica</option>
@@ -240,17 +265,17 @@ ${steps}
 
       {/* FILTRI */}
       <section className="filters">
-        <h2>Filtri</h2>
+        <h2>{t.filters}</h2>
         <div className="filter-grid">
           <select value={budget} onChange={(e) => setBudget(e.target.value)}>
-            <option value="">Budget</option>
+            <option value="">{t.budget}</option>
             <option value="basso">Basso</option>
             <option value="medio">Medio</option>
             <option value="alto">Alto</option>
           </select>
 
           <select value={time} onChange={(e) => setTime(e.target.value)}>
-            <option value="">Tempo</option>
+            <option value="">{t.time}</option>
             <option value="10 min">10 min</option>
             <option value="20 min">20 min</option>
             <option value="30 min">30 min</option>
@@ -258,7 +283,7 @@ ${steps}
           </select>
 
           <select value={mealType} onChange={(e) => setMealType(e.target.value)}>
-            <option value="">Tipo di pasto</option>
+            <option value="">{t.mealType}</option>
             <option value="colazione">Colazione</option>
             <option value="pranzo">Pranzo</option>
             <option value="cena">Cena</option>
@@ -266,14 +291,14 @@ ${steps}
           </select>
 
           <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-            <option value="">Difficoltà</option>
+            <option value="">{t.difficulty}</option>
             <option value="facile">Facile</option>
             <option value="media">Media</option>
             <option value="difficile">Difficile</option>
           </select>
 
           <select value={diet} onChange={(e) => setDiet(e.target.value)}>
-            <option value="">Dieta</option>
+            <option value="">{t.diet}</option>
             <option value="vegano">Vegano</option>
             <option value="vegetariano">Vegetariano</option>
             <option value="halal">Halal</option>
@@ -284,40 +309,39 @@ ${steps}
 
       {/* GENERATORE */}
       <section className="generator">
-        <h2>Genera una ricetta</h2>
+        <h2>{t.generate}</h2>
 
         <input
           type="text"
-          placeholder="Inserisci gli ingredienti"
+          placeholder={t.ingredientsPlaceholder}
           value={ingredients}
           onChange={(e) => setIngredients(e.target.value)}
           className="input"
         />
 
         <button onClick={generateRecipe} className="btn">
-          Genera ricetta
+          {t.generate}
         </button>
+
+        {loading && (
+          <div className="loader">⏳</div>
+        )}
 
         {recipe && (
           <div className="result">
-            <h3>Ricetta generata:</h3>
+            <pre className="recipe-output">{recipe}</pre>
 
-            {/* FIX DEFINITIVO TESTO INVISIBILE */}
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                color: "#ffffff",
-                WebkitTextFillColor: "#ffffff",
-                background: "transparent"
-              }}
-            >
-              {recipe}
-            </pre>
+            <div className="actions">
+              <button className="btn" onClick={copyRecipe}>{t.copy}</button>
+              <button className="btn" onClick={resetAll}>{t.newRecipe}</button>
+            </div>
           </div>
         )}
       </section>
+
+      <footer className="footer">
+        Made with ❤️ by Mame
+      </footer>
     </div>
   );
 }
-
-export default App;
