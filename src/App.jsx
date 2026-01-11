@@ -82,151 +82,306 @@ const translations = {
     aiTip: "Consejo del chef: añade un chorrito de aceite de oliva al final para realzar los sabores."
   }
 };
-
 /* ============================================================
-   EMOJI DEL PIATTO
+   ANALISI INGREDIENTI + EMOJI DEL PIATTO
 ============================================================ */
+
+// Emoji in base agli ingredienti principali
 function getDishEmoji(ingredients) {
-  const text = ingredients.join(" ");
+  const text = ingredients.join(" ").toLowerCase();
 
   if (/pasta|spaghetti|penne|fusilli/.test(text)) return "🍝";
   if (/pollo|manzo|carne|tacchino/.test(text)) return "🍗";
-  if (/pesce|salmone|tonno/.test(text)) return "🐟";
-  if (/verdura|insalata|zucchina|carota/.test(text)) return "🥗";
-  if (/dolce|zucchero|cioccolato/.test(text)) return "🍰";
+  if (/pesce|salmone|tonno|merluzzo/.test(text)) return "🐟";
+  if (/verdura|insalata|zucchina|carota|spinaci|peperone/.test(text)) return "🥗";
+  if (/dolce|zucchero|cioccolato|torta/.test(text)) return "🍰";
 
   return "🍽️";
 }
 
+// Analisi intelligente degli ingredienti
+function analyzeIngredients(list) {
+  const lower = list.map(i => i.toLowerCase());
+
+  return {
+    proteins: lower.filter(i => /pollo|manzo|carne|tacchino|pesce|salmone|tonno/.test(i)),
+    carbs: lower.filter(i => /pasta|riso|patate|pane|couscous|quinoa/.test(i)),
+    veggies: lower.filter(i => /zucchina|carota|cipolla|pomodoro|insalata|spinaci|peperone/.test(i)),
+    aromatics: lower.filter(i => /aglio|cipolla|basilico|prezzemolo|rosmarino|origano|zenzero/.test(i)),
+    fats: lower.filter(i => /olio|burro|panna/.test(i)),
+    spices: lower.filter(i => /pepe|paprika|curcuma|curry|peperoncino/.test(i))
+  };
+}
 /* ============================================================
-   GENERATORE RICETTA — VERSIONE MIX (PROFESSIONALE + INTELLIGENTE)
+   GENERATORE RICETTA — VERSIONE ULTRA PRO PREMIUM
 ============================================================ */
-function generateRecipeText(list, filters, t, lang) {
+
+function generateUltraRecipe(list, filters, t, lang) {
+  const ing = analyzeIngredients(list);
   const ingredientsText = list.join(", ");
 
-  const proteins = list.filter(i => /pollo|manzo|carne|tacchino|pesce|salmone|tonno/.test(i));
-  const carbs = list.filter(i => /pasta|riso|patate|pane|couscous|quinoa/.test(i));
-  const veggies = list.filter(i => /zucchina|carota|cipolla|pomodoro|insalata|spinaci|peperone/.test(i));
-  const aromatics = list.filter(i => /aglio|cipolla|basilico|prezzemolo|rosmarino|origano/.test(i));
-
-  const title = {
-    it: `Ricetta con ${ingredientsText}`,
-    en: `Recipe with ${ingredientsText}`,
-    fr: `Recette avec ${ingredientsText}`,
-    es: `Receta con ${ingredientsText}`
+  /* ------------------------------------------------------------
+     1. TITOLO CREATIVO AUTOMATICO
+  ------------------------------------------------------------ */
+  const creativeTitle = {
+    it: `Padellata di ${ingredientsText} in stile ${filters.culture || "fusion"}`,
+    en: `${ingredientsText} Fusion Skillet`,
+    fr: `Poêlée de ${ingredientsText} façon ${filters.culture || "fusion"}`,
+    es: `Salteado de ${ingredientsText} estilo ${filters.culture || "fusión"}`
   }[lang];
 
-  const intro = {
-    it: `Una ricetta personalizzata basata sugli ingredienti che hai inserito. Preparazione bilanciata, professionale e ottimizzata.`,
-    en: `A personalized recipe based on the ingredients you provided. Balanced, professional and optimized preparation.`,
-    fr: `Une recette personnalisée basée sur les ingrédients que vous avez fournis. Préparation équilibrée, professionnelle et optimisée.`,
-    es: `Una receta personalizada basada en los ingredientes que proporcionaste. Preparación equilibrada, profesional y optimizada.`
+  /* ------------------------------------------------------------
+     2. DESCRIZIONE DEL PIATTO
+  ------------------------------------------------------------ */
+  const description = {
+    it: `Un piatto equilibrato, moderno e ottimizzato, creato analizzando automaticamente gli ingredienti che hai inserito.`,
+    en: `A balanced, modern and optimized dish, automatically generated from your ingredients.`,
+    fr: `Un plat équilibré, moderne et optimisé, généré automatiquement à partir de vos ingrédients.`,
+    es: `Un plato equilibrado, moderno y optimizado, generado automáticamente a partir de tus ingredientes.`
   }[lang];
 
-  const steps = {
+  /* ------------------------------------------------------------
+     3. UTENSILI NECESSARI
+  ------------------------------------------------------------ */
+  const tools = {
+    it: `- Padella antiaderente\n- Pentola per eventuali carboidrati\n- Tagliere\n- Coltello affilato\n- Cucchiaio di legno`,
+    en: `- Non-stick pan\n- Pot for carbs\n- Cutting board\n- Sharp knife\n- Wooden spoon`,
+    fr: `- Poêle antiadhésive\n- Casserole pour les féculents\n- Planche à découper\n- Couteau bien aiguisé\n- Cuillère en bois`,
+    es: `- Sartén antiadherente\n- Olla para carbohidratos\n- Tabla de cortar\n- Cuchillo afilado\n- Cuchara de madera`
+  }[lang];
+
+  /* ------------------------------------------------------------
+     4. TEMPI E PORZIONI
+  ------------------------------------------------------------ */
+  const info = {
+    it: `Tempo totale: 20–30 min\nPorzioni: 2`,
+    en: `Total time: 20–30 min\nServings: 2`,
+    fr: `Temps total : 20–30 min\nPortions : 2`,
+    es: `Tiempo total: 20–30 min\nPorciones: 2`
+  }[lang];
+
+  /* ------------------------------------------------------------
+     5. PREPARAZIONE INTELLIGENTE
+  ------------------------------------------------------------ */
+  const prep = {
     it: `
 1. Preparazione degli ingredienti
-   - Lava e prepara: ${veggies.length ? veggies.join(", ") : "le verdure disponibili"}.
+   - Lava e prepara: ${ing.veggies.length ? ing.veggies.join(", ") : "le verdure disponibili"}.
    - Taglia tutto in pezzi uniformi.
-   ${aromatics.length ? `- Trita finemente: ${aromatics.join(", ")}.` : ""}
-
-2. Cottura principale
-   ${proteins.length ? `- Cuoci prima ${proteins.join(", ")} per 6–8 minuti a fuoco medio.` : ""}
-   ${carbs.length ? `- Cuoci separatamente ${carbs.join(", ")} (8–12 minuti).` : ""}
-   - Salta le verdure con un filo d’olio per 5 minuti.
-
-3. Assemblaggio
-   - Unisci tutto in padella e mescola con delicatezza.
-   - Aggiungi sale, pepe e spezie secondo la cultura scelta.
-
-4. Impiattamento professionale
-   - Usa un piatto bianco per valorizzare i colori.
-   - Aggiungi un tocco finale: erbe fresche o un filo d’olio.
-
-${t.aiTip}
-
-${t.finalMessage}
+   ${ing.aromatics.length ? `- Trita finemente: ${ing.aromatics.join(", ")}.` : ""}
 `,
-
     en: `
 1. Ingredient preparation
-   - Wash and prep: ${veggies.length ? veggies.join(", ") : "the available vegetables"}.
+   - Wash and prep: ${ing.veggies.length ? ing.veggies.join(", ") : "the available vegetables"}.
    - Cut everything into uniform pieces.
-   ${aromatics.length ? `- Finely chop: ${aromatics.join(", ")}.` : ""}
-
-2. Main cooking
-   ${proteins.length ? `- Cook ${proteins.join(", ")} first for 6–8 minutes over medium heat.` : ""}
-   ${carbs.length ? `- Cook ${carbs.join(", ")} separately (8–12 minutes).` : ""}
-   - Sauté the vegetables with a drizzle of oil for 5 minutes.
-
-3. Assembly
-   - Combine everything in the pan and mix gently.
-   - Add salt, pepper and spices according to the selected culture.
-
-4. Professional plating
-   - Use a white plate to enhance the colors.
-   - Add a final touch: fresh herbs or a drizzle of olive oil.
-
-${t.aiTip}
-
-${t.finalMessage}
+   ${ing.aromatics.length ? `- Finely chop: ${ing.aromatics.join(", ")}.` : ""}
 `,
-
     fr: `
 1. Préparation des ingrédients
-   - Lavez et préparez : ${veggies.length ? veggies.join(", ") : "les légumes disponibles"}.
+   - Lavez et préparez : ${ing.veggies.length ? ing.veggies.join(", ") : "les légumes disponibles"}.
    - Coupez tout en morceaux réguliers.
-   ${aromatics.length ? `- Hachez finement : ${aromatics.join(", ")}.` : ""}
-
-2. Cuisson principale
-   ${proteins.length ? `- Faites cuire ${proteins.join(", ")} pendant 6–8 minutes.` : ""}
-   ${carbs.length ? `- Faites cuire ${carbs.join(", ")} séparément (8–12 minutes).` : ""}
-   - Faites revenir les légumes avec un filet d’huile pendant 5 minutes.
-
-3. Assemblage
-   - Mélangez le tout délicatement.
-   - Ajoutez sel, poivre et épices selon la culture choisie.
-
-4. Dressage professionnel
-   - Utilisez une assiette blanche pour mettre en valeur les couleurs.
-   - Ajoutez une touche finale : herbes fraîches ou filet d’huile.
-
-${t.aiTip}
-
-${t.finalMessage}
+   ${ing.aromatics.length ? `- Hachez finement : ${ing.aromatics.join(", ")}.` : ""}
 `,
-
     es: `
 1. Preparación de los ingredientes
-   - Lava y prepara: ${veggies.length ? veggies.join(", ") : "las verduras disponibles"}.
+   - Lava y prepara: ${ing.veggies.length ? ing.veggies.join(", ") : "las verduras disponibles"}.
    - Corta todo en trozos uniformes.
-   ${aromatics.length ? `- Pica finamente: ${aromatics.join(", ")}.` : ""}
+   ${ing.aromatics.length ? `- Pica finamente: ${ing.aromatics.join(", ")}.` : ""}
+`
+  }[lang];
 
-2. Cocción principal
-   ${proteins.length ? `- Cocina primero ${proteins.join(", ")} durante 6–8 minutos.` : ""}
-   ${carbs.length ? `- Cocina ${carbs.join(", ")} por separado (8–12 minutos).` : ""}
+  /* ------------------------------------------------------------
+     6. COTTURA PROFESSIONALE
+  ------------------------------------------------------------ */
+  const cooking = {
+    it: `
+2. Cottura professionale
+   ${ing.proteins.length ? `- Cuoci prima ${ing.proteins.join(", ")} per 6–8 minuti a fuoco medio.` : ""}
+   ${ing.carbs.length ? `- Cuoci separatamente ${ing.carbs.join(", ")} (8–12 minuti).` : ""}
+   - Salta le verdure con un filo d’olio per 5 minuti.
+   - Aggiungi spezie: ${ing.spices.length ? ing.spices.join(", ") : "a piacere"}.
+`,
+    en: `
+2. Professional cooking
+   ${ing.proteins.length ? `- Cook ${ing.proteins.join(", ")} first for 6–8 minutes over medium heat.` : ""}
+   ${ing.carbs.length ? `- Cook ${ing.carbs.join(", ")} separately (8–12 minutes).` : ""}
+   - Sauté the vegetables with a drizzle of oil for 5 minutes.
+   - Add spices: ${ing.spices.length ? ing.spices.join(", ") : "to taste"}.
+`,
+    fr: `
+2. Cuisson professionnelle
+   ${ing.proteins.length ? `- Faites cuire ${ing.proteins.join(", ")} pendant 6–8 minutes.` : ""}
+   ${ing.carbs.length ? `- Faites cuire ${ing.carbs.join(", ")} séparément (8–12 minutes).` : ""}
+   - Faites revenir les légumes avec un filet d’huile pendant 5 minutes.
+   - Ajoutez des épices : ${ing.spices.length ? ing.spices.join(", ") : "à votre goût"}.
+`,
+    es: `
+2. Cocción profesional
+   ${ing.proteins.length ? `- Cocina ${ing.proteins.join(", ")} durante 6–8 minutos.` : ""}
+   ${ing.carbs.length ? `- Cocina ${ing.carbs.join(", ")} por separado (8–12 minutos).` : ""}
    - Saltea las verduras con aceite durante 5 minutos.
+   - Añade especias: ${ing.spices.length ? ing.spices.join(", ") : "al gusto"}.
+`
+  }[lang];
 
+  /* ------------------------------------------------------------
+     7. ASSEMBLAGGIO
+  ------------------------------------------------------------ */
+  const assembly = {
+    it: `
+3. Assemblaggio
+   - Unisci tutto in padella e mescola con delicatezza.
+   - Regola sale, pepe e intensità delle spezie.
+`,
+    en: `
+3. Assembly
+   - Combine everything in the pan and mix gently.
+   - Adjust salt, pepper and spice intensity.
+`,
+    fr: `
+3. Assemblage
+   - Mélangez tout dans la poêle avec délicatesse.
+   - Ajustez sel, poivre et intensité des épices.
+`,
+    es: `
 3. Ensamblaje
-   - Mezcla todo con suavidad.
-   - Añade sal, pimienta y especias según la cultura seleccionada.
+   - Mezcla todo con suavidad en la sartén.
+   - Ajusta sal, pimienta e intensidad de las especias.
+`
+  }[lang];
 
-4. Emplatado profesional
+  /* ------------------------------------------------------------
+     8. IMPIATTAMENTO PREMIUM
+  ------------------------------------------------------------ */
+  const plating = {
+    it: `
+4. Impiattamento premium
+   - Usa un piatto bianco per valorizzare i colori.
+   - Aggiungi erbe fresche o un filo d’olio finale.
+`,
+    en: `
+4. Premium plating
+   - Use a white plate to enhance the colors.
+   - Add fresh herbs or a final drizzle of oil.
+`,
+    fr: `
+4. Dressage premium
+   - Utilisez une assiette blanche pour mettre en valeur les couleurs.
+   - Ajoutez des herbes fraîches ou un filet d’huile.
+`,
+    es: `
+4. Emplatado premium
    - Usa un plato blanco para resaltar los colores.
-   - Añade un toque final: hierbas frescas o aceite.
+   - Añade hierbas frescas o un chorrito de aceite.
+`
+  }[lang];
+
+  /* ------------------------------------------------------------
+     9. VARIANTI CULTURALI
+  ------------------------------------------------------------ */
+  const variants = {
+    it: `
+5. Varianti culturali
+   - Italiana: aggiungi basilico e un cucchiaio di parmigiano.
+   - Africana: aggiungi curry, paprika e un tocco di zenzero.
+   - Asiatica: salsa di soia, sesamo e zenzero.
+   - Americana: aggiungi paprika affumicata.
+`,
+    en: `
+5. Cultural variations
+   - Italian: basil and parmesan.
+   - African: curry, paprika, ginger.
+   - Asian: soy sauce, sesame, ginger.
+   - American: smoked paprika.
+`,
+    fr: `
+5. Variantes culturelles
+   - Italienne : basilic et parmesan.
+   - Africaine : curry, paprika, gingembre.
+   - Asiatique : sauce soja, sésame, gingembre.
+   - Américaine : paprika fumé.
+`,
+    es: `
+5. Variantes culturales
+   - Italiana: albahaca y parmesano.
+   - Africana: curry, paprika, jengibre.
+   - Asiática: salsa de soja, sésamo, jengibre.
+   - Americana: pimentón ahumado.
+`
+  }[lang];
+
+  /* ------------------------------------------------------------
+     10. ERRORI COMUNI
+  ------------------------------------------------------------ */
+  const mistakes = {
+    it: `
+6. Errori comuni da evitare
+   - Cuocere tutto insieme senza ordine.
+   - Tagliare gli ingredienti in dimensioni diverse.
+   - Aggiungere le spezie troppo tardi.
+`,
+    en: `
+6. Common mistakes to avoid
+   - Cooking everything together without order.
+   - Cutting ingredients unevenly.
+   - Adding spices too late.
+`,
+    fr: `
+6. Erreurs courantes à éviter
+   - Tout cuire en même temps sans ordre.
+   - Couper les ingrédients de manière irrégulière.
+   - Ajouter les épices trop tard.
+`,
+    es: `
+6. Errores comunes a evitar
+   - Cocinar todo junto sin orden.
+   - Cortar los ingredientes de forma desigual.
+   - Añadir las especias demasiado tarde.
+`
+  }[lang];
+
+  /* ------------------------------------------------------------
+     11. VALORI NUTRIZIONALI (STIMATI)
+  ------------------------------------------------------------ */
+  const nutrition = {
+    it: `Calorie: ~450–550 kcal\nProteine: alte\nCarboidrati: medi\nGrassi: moderati`,
+    en: `Calories: ~450–550 kcal\nProtein: high\nCarbs: medium\nFat: moderate`,
+    fr: `Calories : ~450–550 kcal\nProtéines : élevées\nGlucides : moyens\nLipides : modérés`,
+    es: `Calorías: ~450–550 kcal\nProteínas: altas\nCarbohidratos: medios\nGrasas: moderadas`
+  }[lang];
+
+  /* ------------------------------------------------------------
+     OUTPUT FINALE
+  ------------------------------------------------------------ */
+  return `
+${creativeTitle}
+
+${description}
+
+${info}
+
+Utensili necessari:
+${tools}
+
+${prep}
+${cooking}
+${assembly}
+${plating}
+${variants}
+${mistakes}
+
+Valori nutrizionali:
+${nutrition}
 
 ${t.aiTip}
 
 ${t.finalMessage}
-`
-  };
-
-  return `${title}\n\n${intro}\n${steps[lang]}`;
+`;
 }
-
 /* ============================================================
-   COMPONENTE PRINCIPALE
+   COMPONENTE PRINCIPALE — APP COMPLETA
 ============================================================ */
+
 export default function App() {
   const [ingredients, setIngredients] = useState("");
   const [recipe, setRecipe] = useState("");
@@ -254,7 +409,17 @@ export default function App() {
 
     setTimeout(() => {
       const emoji = getDishEmoji(list);
-      const text = generateRecipeText(list, {}, t, language);
+
+      const filters = {
+        budget,
+        time,
+        mealType,
+        difficulty,
+        diet,
+        culture
+      };
+
+      const text = generateUltraRecipe(list, filters, t, language);
 
       setRecipe(`${emoji} ${t.resultTitle}\n\n${text}`);
       setLoading(false);
