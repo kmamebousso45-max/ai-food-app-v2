@@ -1,279 +1,321 @@
-import './App.css';
-import { useState, useEffect } from 'react';
+import { useState } from "react";
+import "./App.css";
 
-function App() {
-  const [lang, setLang] = useState('it');
-  const [search, setSearch] = useState('');
-  const [mealType, setMealType] = useState('all');
-  const [budget, setBudget] = useState('all');
-  const [difficulty, setDifficulty] = useState('all');
-  const [diet, setDiet] = useState('all');
-  const [culture, setCulture] = useState('all');
-  const [favorites, setFavorites] = useState([]);
+/* ============================================================
+   CLASSIFICAZIONE AUTOMATICA INGREDIENTI
+============================================================ */
+function classifyIngredients(list) {
+  const washList = ["pomodoro","zucchina","carota","insalata","spinaci","peperone","cipolla","patata","melanzana","broccoli","cavolo"];
+  const cookFirst = ["pollo","manzo","tacchino","maiale","carne","pesce","salmone","tonno fresco","gamberi"];
+  const boilSeparately = ["pasta","riso","couscous","quinoa","spaghetti","penne","fusilli","tagliatelle"];
+  const readyToUse = ["pane","formaggio","mozzarella","tonno","olive","prosciutto","salame","yogurt"];
 
-  // Carica preferiti da localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('favorites');
-    if (saved) setFavorites(JSON.parse(saved));
-  }, []);
+  const toWash = [];
+  const toCookFirst = [];
+  const toBoil = [];
+  const ready = [];
+  const others = [];
 
-  // Salva preferiti
-  useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
+  list.forEach(item => {
+    if (washList.includes(item)) toWash.push(item);
+    else if (cookFirst.includes(item)) toCookFirst.push(item);
+    else if (boilSeparately.includes(item)) toBoil.push(item);
+    else if (readyToUse.includes(item)) ready.push(item);
+    else others.push(item);
+  });
 
-  const toggleFavorite = (recipe) => {
-    const exists = favorites.find((f) => f.name === recipe.name);
-    if (exists) {
-      setFavorites(favorites.filter((f) => f.name !== recipe.name));
-    } else {
-      setFavorites([...favorites, recipe]);
+  return { toWash, toCookFirst, toBoil, ready, others };
+}
+
+/* ============================================================
+   PROFILI CULTURALI
+============================================================ */
+function applyCulture(culture) {
+  const profiles = {
+    italiana: {
+      base: "Usa olio extravergine, basilico fresco e cottura lenta.",
+      spices: "origano, basilico, pepe nero",
+      plating: "impiattamento pulito, minimalista, con filo d’olio a crudo"
+    },
+    africana: {
+      base: "Usa spezie forti, cottura lunga e sapori intensi.",
+      spices: "curcuma, curry, paprika, zenzero",
+      plating: "porzioni abbondanti, colori vivaci"
+    },
+    asiatica: {
+      base: "Cottura veloce nel wok, sapori bilanciati.",
+      spices: "zenzero, salsa di soia, sesamo",
+      plating: "impiattamento compatto, ordinato"
+    },
+    americana: {
+      base: "Cotture ricche, burro, griglia e porzioni grandi.",
+      spices: "paprika affumicata, pepe, BBQ rub",
+      plating: "impiattamento rustico"
+    },
+    francese: {
+      base: "Tecniche precise, burro, riduzioni e eleganza.",
+      spices: "timo, rosmarino, pepe bianco",
+      plating: "impiattamento raffinato"
+    },
+    spagnola: {
+      base: "Soffritto, paprika, cotture lente e sapori intensi.",
+      spices: "paprika dolce, aglio, prezzemolo",
+      plating: "impiattamento conviviale"
     }
   };
 
-  const titles = {
-    it: 'AI Food App 🍲',
-    fr: 'AI Food App 🍲',
-    en: 'AI Food App 🍲',
+  return profiles[culture] || {
+    base: "Stile neutro e versatile.",
+    spices: "sale, pepe, erbe miste",
+    plating: "impiattamento semplice"
   };
+}
 
-  const subtitles = {
-    it: 'Benvenuto nella Versione 3 della tua app multiculturale e multilingua!',
-    fr: 'Bienvenue dans la version 3 de votre application multiculturelle et multilingue !',
-    en: 'Welcome to Version 3 of your multicultural and multilingual app!',
+/* ============================================================
+   PROFILI DIFFICOLTÀ
+============================================================ */
+function applyDifficulty(level) {
+  const profiles = {
+    facile: "Tecniche semplici, pochi passaggi, zero complessità.",
+    media: "Tecniche base + qualche passaggio più preciso.",
+    difficile: "Tecniche professionali, tempi precisi, riduzioni e mantecature."
   };
+  return profiles[level] || "Tecniche standard.";
+}
 
-  const recipes = {
-    it: [
-      {
-        name: 'Couscous marocchino',
-        ingredients: 'Semola, verdure, ceci, spezie',
-        description: 'Un piatto tradizionale ricco di sapore e cultura.',
-        mealType: 'lunch',
-        budget: 'low',
-        difficulty: 'easy',
-        diet: 'halal',
-        culture: 'african'
-      },
-      {
-        name: 'Riso alla senegalese (Ceebu Jën)',
-        ingredients: 'Riso, pesce, verdure, pomodoro',
-        description: 'Il piatto nazionale del Senegal, nutriente e colorato.',
-        mealType: 'lunch',
-        budget: 'medium',
-        difficulty: 'medium',
-        diet: 'normal',
-        culture: 'african'
-      }
-    ],
-    fr: [
-      {
-        name: 'Couscous marocain',
-        ingredients: 'Semoule, légumes, pois chiches, épices',
-        description: 'Un plat traditionnel riche en saveurs et en culture.',
-        mealType: 'lunch',
-        budget: 'low',
-        difficulty: 'easy',
-        diet: 'halal',
-        culture: 'african'
-      },
-      {
-        name: 'Riz sénégalais (Ceebu Jën)',
-        ingredients: 'Riz, poisson, légumes, tomate',
-        description: 'Le plat national du Sénégal, nourrissant et coloré.',
-        mealType: 'lunch',
-        budget: 'medium',
-        difficulty: 'medium',
-        diet: 'normal',
-        culture: 'african'
-      }
-    ],
-    en: [
-      {
-        name: 'Moroccan Couscous',
-        ingredients: 'Semolina, vegetables, chickpeas, spices',
-        description: 'A traditional dish full of flavor and culture.',
-        mealType: 'lunch',
-        budget: 'low',
-        difficulty: 'easy',
-        diet: 'halal',
-        culture: 'african'
-      },
-      {
-        name: 'Senegalese Rice (Ceebu Jën)',
-        ingredients: 'Rice, fish, vegetables, tomato',
-        description: 'The national dish of Senegal, nourishing and colorful.',
-        mealType: 'lunch',
-        budget: 'medium',
-        difficulty: 'medium',
-        diet: 'normal',
-        culture: 'african'
-      }
-    ]
+/* ============================================================
+   PROFILI BUDGET
+============================================================ */
+function applyBudget(budget) {
+  const profiles = {
+    basso: "Ingredienti economici, ricetta semplice e ottimizzata.",
+    medio: "Ingredienti freschi e bilanciati.",
+    alto: "Ingredienti premium, tecniche gourmet e impiattamento elegante."
   };
+  return profiles[budget] || "Budget neutro.";
+}
 
-  const filteredRecipes = recipes[lang].filter(recipe => {
-    const searchText = search.toLowerCase();
+/* ============================================================
+   PROFILI TIPO DI PASTO
+============================================================ */
+function applyMealType(type) {
+  const profiles = {
+    colazione: "Ricetta leggera e veloce, perfetta per iniziare la giornata.",
+    pranzo: "Pasto completo e bilanciato.",
+    cena: "Ricetta più leggera o elegante.",
+    snack: "Preparazione rapida e semplice."
+  };
+  return profiles[type] || "Pasto generico.";
+}
 
-    const matchesSearch =
-      recipe.name.toLowerCase().includes(searchText) ||
-      recipe.ingredients.toLowerCase().includes(searchText);
+/* ============================================================
+   MOTORE INTELLIGENTE DI RICETTE
+============================================================ */
+function generateSmartRecipe(list, filters) {
+  const { toWash, toCookFirst, toBoil, ready, others } = classifyIngredients(list);
+  const culture = applyCulture(filters.culture);
+  const difficulty = applyDifficulty(filters.difficulty);
+  const budget = applyBudget(filters.budget);
+  const mealType = applyMealType(filters.mealType);
 
-    const matchesMeal =
-      mealType === 'all' || recipe.mealType === mealType;
+  let steps = "";
 
-    const matchesBudget =
-      budget === 'all' || recipe.budget === budget;
+  steps += "1. **Preparazione degli ingredienti**\n";
+  if (toWash.length) steps += `   - Lava e taglia: ${toWash.join(", ")}.\n`;
+  if (others.length) steps += `   - Taglia a pezzi: ${others.join(", ")}.\n`;
+  if (ready.length) steps += `   - Tieni da parte (pronti all’uso): ${ready.join(", ")}.\n`;
+  if (toBoil.length) steps += `   - Prepara una pentola d’acqua salata per: ${toBoil.join(", ")}.\n`;
 
-    const matchesDifficulty =
-      difficulty === 'all' || recipe.difficulty === difficulty;
+  steps += "\n2. **Preparazione del condimento**\n";
+  steps += `   - ${culture.base}\n`;
+  steps += "   - Scalda una padella con olio.\n";
 
-    const matchesDiet =
-      diet === 'all' || recipe.diet === diet;
+  if (toCookFirst.length) steps += `   - Cuoci per primi: ${toCookFirst.join(", ")}.\n`;
+  if (others.length) steps += `   - Aggiungi poi: ${others.join(", ")}.\n`;
+  if (toWash.length) steps += `   - Aggiungi infine: ${toWash.join(", ")} e cuoci 5–7 minuti.\n`;
 
-    const matchesCulture =
-      culture === 'all' || recipe.culture === culture;
+  if (toBoil.length) {
+    steps += "\n3. **Cottura separata**\n";
+    steps += `   - Cuoci ${toBoil.join(", ")} secondo i tempi indicati.\n`;
+    steps += "   - Scola e tieni da parte.\n";
+  }
 
-    return (
-      matchesSearch &&
-      matchesMeal &&
-      matchesBudget &&
-      matchesDifficulty &&
-      matchesDiet &&
-      matchesCulture
-    );
-  });
+  if (toBoil.length) {
+    steps += "\n4. **Unione**\n";
+    steps += `   - Unisci ${toBoil.join(", ")} al condimento.\n`;
+    steps += "   - Mescola bene.\n";
+  }
+
+  steps += "\n5. **Finalizzazione**\n";
+  steps += `   - ${difficulty}\n`;
+  steps += `   - Aggiungi spezie tipiche: ${culture.spices}.\n`;
+
+  steps += "\n6. **Impiattamento**\n";
+  steps += `   - ${culture.plating}.\n`;
+  if (ready.includes("pane")) steps += "   - Servi il pane a lato.\n";
+
+  steps += "\n7. **Valori nutrizionali (stima)**\n";
+  steps += "   - Porzioni: 1–2\n";
+  steps += "   - Calorie: 350–650 kcal\n";
+
+  return steps;
+}
+
+/* ============================================================
+   COMPONENTE PRINCIPALE
+============================================================ */
+function App() {
+  const [ingredients, setIngredients] = useState("");
+  const [recipe, setRecipe] = useState("");
+
+  const [budget, setBudget] = useState("");
+  const [time, setTime] = useState("");
+  const [mealType, setMealType] = useState("");
+  const [difficulty, setDifficulty] = useState("");
+  const [diet, setDiet] = useState("");
+  const [language, setLanguage] = useState("it");
+  const [culture, setCulture] = useState("");
+
+  function generateRecipe() {
+    const list = ingredients
+      .split(/[\s,;]+/)
+      .map(i => i.trim().toLowerCase())
+      .filter(i => i.length > 0);
+
+    const filters = { budget, time, mealType, difficulty, diet, culture };
+    const steps = generateSmartRecipe(list, filters);
+
+    const finalRecipe = `
+🍽️ Ricetta personalizzata
+
+Ingredienti:
+${list.map(i => "• " + i).join("\n")}
+
+Dettagli selezionati:
+• Budget: ${budget || "non specificato"}
+• Tempo: ${time || "non specificato"}
+• Tipo di pasto: ${mealType || "non specificato"}
+• Difficoltà: ${difficulty || "non specificata"}
+• Dieta: ${diet || "non specificata"}
+• Cultura: ${culture || "non specificata"}
+• Lingua: ${language}
+
+────────────────────────────
+
+${steps}
+`;
+
+    setRecipe(finalRecipe);
+  }
 
   return (
-    <div className="app">
-      <div className="lang-selector">
-        <button onClick={() => setLang('it')}>🇮🇹 IT</button>
-        <button onClick={() => setLang('fr')}>🇫🇷 FR</button>
-        <button onClick={() => setLang('en')}>🇬🇧 EN</button>
-      </div>
+    <div className="container">
+      <header>
+        <h1 className="title">AI Food App</h1>
+        <p className="subtitle">La cucina intelligente che capisce davvero cosa stai cucinando</p>
+      </header>
 
-      <h1>{titles[lang]}</h1>
-      <p>{subtitles[lang]}</p>
+      {/* LINGUA & CULTURA */}
+      <section className="filters">
+        <h2>Lingua & Cultura</h2>
+        <div className="filter-grid">
+          <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+            <option value="it">Italiano</option>
+            <option value="en">Inglese</option>
+            <option value="fr">Francese</option>
+            <option value="es">Spagnolo</option>
+          </select>
 
-      <input
-        type="text"
-        placeholder={
-          lang === 'it' ? 'Cerca ricette...' :
-          lang === 'fr' ? 'Rechercher des recettes...' :
-          'Search recipes...'
-        }
-        className="search-bar"
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <div className="filters">
-        <div className="meal-buttons">
-          <button
-            className={mealType === 'all' ? 'active' : ''}
-            onClick={() => setMealType('all')}
-          >
-            {lang === 'it' ? 'Tutti' : lang === 'fr' ? 'Tous' : 'All'}
-          </button>
-          <button
-            className={mealType === 'breakfast' ? 'active' : ''}
-            onClick={() => setMealType('breakfast')}
-          >
-            {lang === 'it' ? 'Colazione' : lang === 'fr' ? 'Petit-déj' : 'Breakfast'}
-          </button>
-          <button
-            className={mealType === 'lunch' ? 'active' : ''}
-            onClick={() => setMealType('lunch')}
-          >
-            {lang === 'it' ? 'Pranzo' : lang === 'fr' ? 'Déjeuner' : 'Lunch'}
-          </button>
-          <button
-            className={mealType === 'dinner' ? 'active' : ''}
-            onClick={() => setMealType('dinner')}
-          >
-            {lang === 'it' ? 'Cena' : lang === 'fr' ? 'Dîner' : 'Dinner'}
-          </button>
+          <select value={culture} onChange={(e) => setCulture(e.target.value)}>
+            <option value="">Cultura</option>
+            <option value="italiana">Italiana</option>
+            <option value="africana">Africana</option>
+            <option value="asiatica">Asiatica</option>
+            <option value="americana">Americana</option>
+            <option value="francese">Francese</option>
+            <option value="spagnola">Spagnola</option>
+          </select>
         </div>
+      </section>
 
-        <select className="dropdown" value={budget} onChange={(e) => setBudget(e.target.value)}>
-          <option value="all">{lang === 'it' ? 'Budget' : lang === 'fr' ? 'Budget' : 'Budget'}</option>
-          <option value="low">{lang === 'it' ? 'Basso' : lang === 'fr' ? 'Bas' : 'Low'}</option>
-          <option value="medium">{lang === 'it' ? 'Medio' : lang === 'fr' ? 'Moyen' : 'Medium'}</option>
-          <option value="high">{lang === 'it' ? 'Alto' : lang === 'fr' ? 'Élevé' : 'High'}</option>
-        </select>
+      {/* FILTRI */}
+      <section className="filters">
+        <h2>Filtri</h2>
+        <div className="filter-grid">
+          <select value={budget} onChange={(e) => setBudget(e.target.value)}>
+            <option value="">Budget</option>
+            <option value="basso">Basso</option>
+            <option value="medio">Medio</option>
+            <option value="alto">Alto</option>
+          </select>
 
-        <select className="dropdown" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-          <option value="all">{lang === 'it' ? 'Difficoltà' : lang === 'fr' ? 'Difficulté' : 'Difficulty'}</option>
-          <option value="easy">{lang === 'it' ? 'Facile' : lang === 'fr' ? 'Facile' : 'Easy'}</option>
-          <option value="medium">{lang === 'it' ? 'Media' : lang === 'fr' ? 'Moyenne' : 'Medium'}</option>
-          <option value="hard">{lang === 'it' ? 'Difficile' : lang === 'fr' ? 'Difficile' : 'Hard'}</option>
-        </select>
+          <select value={time} onChange={(e) => setTime(e.target.value)}>
+            <option value="">Tempo</option>
+            <option value="10 min">10 min</option>
+            <option value="20 min">20 min</option>
+            <option value="30 min">30 min</option>
+            <option value="1 ora">1 ora</option>
+          </select>
 
-        <select className="dropdown" value={diet} onChange={(e) => setDiet(e.target.value)}>
-          <option value="all">{lang === 'it' ? 'Dieta' : lang === 'fr' ? 'Régime' : 'Diet'}</option>
-          <option value="halal">Halal</option>
-          <option value="vegan">Vegan</option>
-          <option value="vegetarian">{lang === 'it' ? 'Vegetariano' : lang === 'fr' ? 'Végétarien' : 'Vegetarian'}</option>
-          <option value="glutenfree">{lang === 'it' ? 'Senza glutine' : lang === 'fr' ? 'Sans gluten' : 'Gluten free'}</option>
-          <option value="normal">{lang === 'it' ? 'Normale' : lang === 'fr' ? 'Normal' : 'Normal'}</option>
-        </select>
+          <select value={mealType} onChange={(e) => setMealType(e.target.value)}>
+            <option value="">Tipo di pasto</option>
+            <option value="colazione">Colazione</option>
+            <option value="pranzo">Pranzo</option>
+            <option value="cena">Cena</option>
+            <option value="snack">Snack</option>
+          </select>
 
-        <select className="dropdown" value={culture} onChange={(e) => setCulture(e.target.value)}>
-          <option value="all">{lang === 'it' ? 'Cultura' : lang === 'fr' ? 'Culture' : 'Culture'}</option>
-          <option value="african">{lang === 'it' ? 'Africana' : lang === 'fr' ? 'Africaine' : 'African'}</option>
-          <option value="european">{lang === 'it' ? 'Europea' : lang === 'fr' ? 'Européenne' : 'European'}</option>
-          <option value="asian">{lang === 'it' ? 'Asiatica' : lang === 'fr' ? 'Asiatique' : 'Asian'}</option>
-          <option value="american">{lang === 'it' ? 'Americana' : lang === 'fr' ? 'Américaine' : 'American'}</option>
-          <option value="middleeast">{lang === 'it' ? 'Medio Oriente' : lang === 'fr' ? 'Moyen-Orient' : 'Middle East'}</option>
-        </select>
-      </div>
+          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+            <option value="">Difficoltà</option>
+            <option value="facile">Facile</option>
+            <option value="media">Media</option>
+            <option value="difficile">Difficile</option>
+          </select>
 
-      <h2 style={{ marginTop: '20px' }}>
-        {lang === 'it' ? 'Preferiti ❤️' : lang === 'fr' ? 'Favoris ❤️' : 'Favorites ❤️'}
-      </h2>
+          <select value={diet} onChange={(e) => setDiet(e.target.value)}>
+            <option value="">Dieta</option>
+            <option value="vegano">Vegano</option>
+            <option value="vegetariano">Vegetariano</option>
+            <option value="halal">Halal</option>
+            <option value="senza glutine">Senza glutine</option>
+          </select>
+        </div>
+      </section>
 
-      <div className="recipes">
-        {favorites.length === 0 && (
-          <p style={{ color: '#777' }}>
-            {lang === 'it'
-              ? 'Nessun preferito ancora.'
-              : lang === 'fr'
-              ? 'Aucun favori pour le moment.'
-              : 'No favorites yet.'}
-          </p>
+      {/* GENERATORE */}
+      <section className="generator">
+        <h2>Genera una ricetta</h2>
+
+        <input
+          type="text"
+          placeholder="Inserisci gli ingredienti"
+          value={ingredients}
+          onChange={(e) => setIngredients(e.target.value)}
+          className="input"
+        />
+
+        <button onClick={generateRecipe} className="btn">
+          Genera ricetta
+        </button>
+
+        {recipe && (
+          <div className="result">
+            <h3>Ricetta generata:</h3>
+
+            {/* FIX DEFINITIVO TESTO INVISIBILE */}
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                color: "#ffffff",
+                WebkitTextFillColor: "#ffffff",
+                background: "transparent"
+              }}
+            >
+              {recipe}
+            </pre>
+          </div>
         )}
-
-        {favorites.map((recipe, index) => (
-          <div key={index} className="recipe-card">
-            <div className="fav-icon" onClick={() => toggleFavorite(recipe)}>
-              ❤️
-            </div>
-            <h2>{recipe.name}</h2>
-            <p><strong>
-              {lang === 'it' ? 'Ingredienti:' : lang === 'fr' ? 'Ingrédients:' : 'Ingredients:'}
-            </strong> {recipe.ingredients}</p>
-            <p>{recipe.description}</p>
-          </div>
-        ))}
-      </div>
-
-      <h2 style={{ marginTop: '20px' }}>
-        {lang === 'it' ? 'Ricette' : lang === 'fr' ? 'Recettes' : 'Recipes'}
-      </h2>
-
-      <div className="recipes">
-        {filteredRecipes.map((recipe, index) => (
-          <div key={index} className="recipe-card">
-            <div className="fav-icon" onClick={() => toggleFavorite(recipe)}>
-              {favorites.find((f) => f.name === recipe.name) ? '❤️' : '🤍'}
-            </div>
-            <h2>{recipe.name}</h2>
-            <p><strong>
-              {lang === 'it' ? 'Ingredienti:' : lang === 'fr' ? 'Ingrédients:' : 'Ingredients:'}
-            </strong> {recipe.ingredients}</p>
-            <p>{recipe.description}</p>
-          </div>
-        ))}
-      </div>
+      </section>
     </div>
   );
 }
