@@ -1,0 +1,147 @@
+/* RESET BASE */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  background: #fafafa;
+  padding: 20px;
+}
+
+/* APP CONTAINER */
+.app {
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+}
+
+/* LINGUE */
+.lang-selector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.lang-selector button {
+  padding: 8px 14px;
+  border: none;
+  background: #eaeaea;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.lang-selector button:hover {
+  background: #d6d6d6;
+}
+
+/* TITOLI */
+h1 {
+  font-size: 26px;
+  margin-bottom: 5px;
+}
+
+p {
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+/* SEARCH BAR */
+.search-bar {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+/* FILTRI */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+/* BOTTONI MEAL TYPE */
+.meal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.meal-buttons button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #eaeaea;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.meal-buttons button.active {
+  background: #ff8c00;
+  color: white;
+  font-weight: bold;
+}
+
+.meal-buttons button:hover {
+  background: #d6d6d6;
+}
+
+/* DROPDOWN */
+.dropdown {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  background: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dropdown:hover {
+  border-color: #ff8c00;
+}
+
+/* RICETTE */
+.recipes {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.recipe-card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  text-align: left;
+}
+
+.recipe-card h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.recipe-card p {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #444;
+}
+.fav-icon {
+  font-size: 22px;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 10px;
+}
