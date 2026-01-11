@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 
 /* ============================================================
-   TRADUZIONI UI + RICETTE PROFESSIONALI
+   TRADUZIONI UI + MESSAGGI FINALI
 ============================================================ */
 const translations = {
   it: {
@@ -99,24 +99,49 @@ function getDishEmoji(ingredients) {
 }
 
 /* ============================================================
-   GENERATORE DI RICETTE MULTILINGUA
+   GENERATORE RICETTA — VERSIONE MIX (PROFESSIONALE + INTELLIGENTE)
 ============================================================ */
 function generateRecipeText(list, filters, t, lang) {
+  const ingredientsText = list.join(", ");
+
+  const proteins = list.filter(i => /pollo|manzo|carne|tacchino|pesce|salmone|tonno/.test(i));
+  const carbs = list.filter(i => /pasta|riso|patate|pane|couscous|quinoa/.test(i));
+  const veggies = list.filter(i => /zucchina|carota|cipolla|pomodoro|insalata|spinaci|peperone/.test(i));
+  const aromatics = list.filter(i => /aglio|cipolla|basilico|prezzemolo|rosmarino|origano/.test(i));
+
+  const title = {
+    it: `Ricetta con ${ingredientsText}`,
+    en: `Recipe with ${ingredientsText}`,
+    fr: `Recette avec ${ingredientsText}`,
+    es: `Receta con ${ingredientsText}`
+  }[lang];
+
+  const intro = {
+    it: `Una ricetta personalizzata basata sugli ingredienti che hai inserito. Preparazione bilanciata, professionale e ottimizzata.`,
+    en: `A personalized recipe based on the ingredients you provided. Balanced, professional and optimized preparation.`,
+    fr: `Une recette personnalisée basée sur les ingrédients que vous avez fournis. Préparation équilibrée, professionnelle et optimisée.`,
+    es: `Una receta personalizada basada en los ingredientes que proporcionaste. Preparación equilibrada, profesional y optimizada.`
+  }[lang];
+
   const steps = {
     it: `
 1. Preparazione degli ingredienti
-   - Lava e prepara: ${list.join(", ")}.
+   - Lava e prepara: ${veggies.length ? veggies.join(", ") : "le verdure disponibili"}.
+   - Taglia tutto in pezzi uniformi.
+   ${aromatics.length ? `- Trita finemente: ${aromatics.join(", ")}.` : ""}
 
-2. Cottura
-   - Scalda una padella e cuoci gli ingredienti con calma.
-   - Aggiungi spezie e aromi secondo la cultura scelta.
+2. Cottura principale
+   ${proteins.length ? `- Cuoci prima ${proteins.join(", ")} per 6–8 minuti a fuoco medio.` : ""}
+   ${carbs.length ? `- Cuoci separatamente ${carbs.join(", ")} (8–12 minuti).` : ""}
+   - Salta le verdure con un filo d’olio per 5 minuti.
 
-3. Finalizzazione
-   - Mescola tutto con cura.
-   - Assaggia e regola sale e spezie.
+3. Assemblaggio
+   - Unisci tutto in padella e mescola con delicatezza.
+   - Aggiungi sale, pepe e spezie secondo la cultura scelta.
 
-4. Impiattamento
-   - Servi con stile e un tocco personale.
+4. Impiattamento professionale
+   - Usa un piatto bianco per valorizzare i colori.
+   - Aggiungi un tocco finale: erbe fresche o un filo d’olio.
 
 ${t.aiTip}
 
@@ -125,18 +150,22 @@ ${t.finalMessage}
 
     en: `
 1. Ingredient preparation
-   - Wash and prepare: ${list.join(", ")}.
+   - Wash and prep: ${veggies.length ? veggies.join(", ") : "the available vegetables"}.
+   - Cut everything into uniform pieces.
+   ${aromatics.length ? `- Finely chop: ${aromatics.join(", ")}.` : ""}
 
-2. Cooking
-   - Heat a pan and cook the ingredients gently.
-   - Add spices and seasonings according to the selected culture.
+2. Main cooking
+   ${proteins.length ? `- Cook ${proteins.join(", ")} first for 6–8 minutes over medium heat.` : ""}
+   ${carbs.length ? `- Cook ${carbs.join(", ")} separately (8–12 minutes).` : ""}
+   - Sauté the vegetables with a drizzle of oil for 5 minutes.
 
-3. Final touch
-   - Combine everything smoothly.
-   - Taste and adjust salt and spices.
+3. Assembly
+   - Combine everything in the pan and mix gently.
+   - Add salt, pepper and spices according to the selected culture.
 
-4. Plating
-   - Serve with elegance and a personal touch.
+4. Professional plating
+   - Use a white plate to enhance the colors.
+   - Add a final touch: fresh herbs or a drizzle of olive oil.
 
 ${t.aiTip}
 
@@ -145,18 +174,22 @@ ${t.finalMessage}
 
     fr: `
 1. Préparation des ingrédients
-   - Lavez et préparez : ${list.join(", ")}.
+   - Lavez et préparez : ${veggies.length ? veggies.join(", ") : "les légumes disponibles"}.
+   - Coupez tout en morceaux réguliers.
+   ${aromatics.length ? `- Hachez finement : ${aromatics.join(", ")}.` : ""}
 
-2. Cuisson
-   - Chauffez une poêle et faites cuire les ingrédients doucement.
-   - Ajoutez des épices selon la culture choisie.
+2. Cuisson principale
+   ${proteins.length ? `- Faites cuire ${proteins.join(", ")} pendant 6–8 minutes.` : ""}
+   ${carbs.length ? `- Faites cuire ${carbs.join(", ")} séparément (8–12 minutes).` : ""}
+   - Faites revenir les légumes avec un filet d’huile pendant 5 minutes.
 
-3. Finition
+3. Assemblage
    - Mélangez le tout délicatement.
-   - Goûtez et ajustez le sel et les épices.
+   - Ajoutez sel, poivre et épices selon la culture choisie.
 
-4. Dressage
-   - Servez avec élégance et une touche personnelle.
+4. Dressage professionnel
+   - Utilisez une assiette blanche pour mettre en valeur les couleurs.
+   - Ajoutez une touche finale : herbes fraîches ou filet d’huile.
 
 ${t.aiTip}
 
@@ -165,18 +198,22 @@ ${t.finalMessage}
 
     es: `
 1. Preparación de los ingredientes
-   - Lava y prepara: ${list.join(", ")}.
+   - Lava y prepara: ${veggies.length ? veggies.join(", ") : "las verduras disponibles"}.
+   - Corta todo en trozos uniformes.
+   ${aromatics.length ? `- Pica finamente: ${aromatics.join(", ")}.` : ""}
 
-2. Cocción
-   - Calienta una sartén y cocina los ingredientes suavemente.
-   - Añade especias según la cultura seleccionada.
+2. Cocción principal
+   ${proteins.length ? `- Cocina primero ${proteins.join(", ")} durante 6–8 minutos.` : ""}
+   ${carbs.length ? `- Cocina ${carbs.join(", ")} por separado (8–12 minutos).` : ""}
+   - Saltea las verduras con aceite durante 5 minutos.
 
-3. Finalización
-   - Mezcla todo con cuidado.
-   - Prueba y ajusta la sal y las especias.
+3. Ensamblaje
+   - Mezcla todo con suavidad.
+   - Añade sal, pimienta y especias según la cultura seleccionada.
 
-4. Emplatado
-   - Sirve con estilo y un toque personal.
+4. Emplatado profesional
+   - Usa un plato blanco para resaltar los colores.
+   - Añade un toque final: hierbas frescas o aceite.
 
 ${t.aiTip}
 
@@ -184,7 +221,7 @@ ${t.finalMessage}
 `
   };
 
-  return steps[lang];
+  return `${title}\n\n${intro}\n${steps[lang]}`;
 }
 
 /* ============================================================
